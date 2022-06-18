@@ -264,6 +264,22 @@ class PaintInfo {
 
   ///In case of string, it is used to save string value entered.
   PaintInfo({this.offset, this.painter, this.text, this.mode});
+
+  PaintInfo.fromJson(Map<String, dynamic> json)
+    : mode = json['mode'] as PaintMode?,
+        painter = json['painter'] as Paint?,
+        offset = json['offset'] as List<Offset?>?,
+        text = json['text'] as String?;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'mode' : mode,
+      'painter' : painter,
+      'offset' : offset,
+      'text' : text,
+    };
+  }
+
 }
 
 @immutable

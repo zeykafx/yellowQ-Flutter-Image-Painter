@@ -44,7 +44,9 @@ class ImagePainter extends StatefulWidget {
       this.onColorChanged,
       this.onStrokeWidthChanged,
       this.onPaintModeChanged,
-      this.textDelegate})
+      this.textDelegate,
+      this.controllerColor,
+       this.imageBytesCallBack})
       : super(key: key);
 
   ///Constructor for loading image from network url.
@@ -113,6 +115,8 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
     bool? controlsAtTop,
+    Color? controllerColor,
+    Function? imageBytesCallBack
   }) {
     return ImagePainter._(
       key: key,
@@ -134,6 +138,8 @@ class ImagePainter extends StatefulWidget {
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
+      controllerColor: controllerColor,
+      imageBytesCallBack: imageBytesCallBack,
     );
   }
 
@@ -195,7 +201,9 @@ class ImagePainter extends StatefulWidget {
     Widget? undoIcon,
     Widget? clearAllIcon,
     Widget? colorIcon,
+    Color? controllerColor,
     PaintMode? initialPaintMode,
+    Function? imageBytesCallBack,
     double? initialStrokeWidth,
     Color? initialColor,
     ValueChanged<PaintMode>? onPaintModeChanged,
@@ -224,6 +232,8 @@ class ImagePainter extends StatefulWidget {
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
+      controllerColor: controllerColor,
+      imageBytesCallBack : imageBytesCallBack,
     );
   }
 
@@ -332,6 +342,10 @@ class ImagePainter extends StatefulWidget {
   //the text delegate
   final TextDelegate? textDelegate;
 
+  final Color? controllerColor;
+
+  final Function? imageBytesCallBack;
+
   @override
   ImagePainterState createState() => ImagePainterState();
 }
@@ -369,6 +383,13 @@ class ImagePainterState extends State<ImagePainter> {
 
   @override
   void dispose() {
+
+    exportImage().then((imageBytes) {
+      if (widget.imageBytesCallBack != null && _paintHistory.isNotEmpty) {
+        widget.imageBytesCallBack!(imageBytes);
+      }
+    });
+
     _controller.dispose();
     _isLoaded.dispose();
     _textController.dispose();
@@ -853,7 +874,6 @@ class ImagePainterState extends State<ImagePainter> {
               icon:
                   widget.undoIcon ?? Icon(Icons.reply, color: Colors.grey[700]),
               onPressed: () {
-                print(_paintHistory.length);
                 if (_paintHistory.isNotEmpty) {
                   setState(_paintHistory.removeLast);
                 }
